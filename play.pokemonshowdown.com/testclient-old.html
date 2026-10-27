@@ -12,7 +12,8 @@
 		<link rel="stylesheet" href="style/font-awesome.css" />
 		<meta name="robots" content="noindex" />
 		<meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-		<script src="https://play.pokemonshowdown.com/config/config.js"></script>
+		<script src="config/config.js"></script>
+		<script>Config.routes.client = location.host;</script>
 		<script>
 			function loadRemoteData(src) {
 				var scriptEl = document.createElement('script');
@@ -132,6 +133,11 @@
 			window.onload = () => {
 				window.app = new App();
 			}
+		</script>
+
+		<script>
+			// Los recursos ya se han resuelto en local; el login debe ir al servidor oficial
+			Config.routes.client = 'play.pokemonshowdown.com';
 		</script>
 
 	</body>

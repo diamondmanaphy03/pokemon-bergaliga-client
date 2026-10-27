@@ -53,7 +53,8 @@
 		linkStyle("style/battle-search.css");
 		linkStyle("style/font-awesome.css");
 	</script>
-	<script src="https://play.pokemonshowdown.com/config/config.js"></script>
+	<script src="config/config.js"></script>
+	<script>Config.routes.client = location.host;</script>
 	<script>
 		if (!window.Config) {
 			// offline
@@ -166,5 +167,10 @@
 	<script src="js/lib/color-thief.min.js"></script>
 
 	<script src="js/client-endload.js?"></script>
+
+	<script>
+		// Los recursos ya se han resuelto en local; el login debe ir al servidor oficial
+		Config.routes.client = 'play.pokemonshowdown.com';
+	</script>
 
 </body></html>
