@@ -77,7 +77,6 @@
 		<script src="js/lib/jquery-cookie.js"></script>
 		<script src="js/lib/autoresize.jquery.min.js"></script>
 		<script src="js/battle-sound.js"></script>
-		<script src="../config/testclient-key.js"></script>
 		<script src="js/lib/html-css-sanitizer-minified.js"></script>
 		<script src="js/lib/lodash.core.js"></script>
 		<script src="js/lib/backbone.js"></script>
@@ -130,14 +129,81 @@
 		<script src="data/commands.js" async="async" onerror="loadRemoteData(this.src)"></script>
 
 		<script>
-			window.onload = () => {
-				window.app = new App();
-			}
+			(function () {
+				if (!window.User || !window.App) return;
+
+				User.prototype.receiveChallstr = function (challstr) {
+					this.challstr = challstr;
+					this.loaded = true;
+					app.topbar.updateUserbar();
+				};
+
+				User.prototype.rename = function (name) {
+					name = name.replace(/[\|,;]+/g, '');
+					for (var i in this.replaceList) name = name.replace(this.replaceList[i], i);
+					for (var j in this.normalizeList) name = name.replace(this.normalizeList[j], j);
+					if (!toUserid(name)) {
+						app.addPopupMessage("Usernames must contain at least one letter.");
+						return;
+					}
+					app.send('/trn ' + name);
+				};
+
+				User.prototype.passwordRename = function (name, password) {
+					app.send('/trn ' + name + ',0,' + password);
+				};
+
+				// El servidor avisa con |nametaken| cuando el nombre necesita contraseña
+				var origAddPopup = App.prototype.addPopup;
+				App.prototype.addPopup = function (type, data) {
+					var self = this;
+					var args = arguments;
+
+					if (window.ProxyPopup && type === ProxyPopup && data && data.uri && data.callback) {
+						try {
+							var target = new URL(data.uri, location.href);
+
+							// Nuestro propio servidor: se resuelve solo
+							if (target.origin === location.origin) {
+								$.ajax({ url: target.href, dataType: 'text' })
+									.done(function (text) { data.callback(text); })
+									.fail(function () { origAddPopup.apply(self, args); });
+								return;
+							}
+
+							// Smogon: devuelve "null" (sin datos); es lo que se pegaría a mano
+							if (/(^|\.)smogon\.com$/.test(target.hostname)) {
+								setTimeout(function () { data.callback('null'); }, 0);
+								return;
+							}
+						} catch (e) {}
+					}
+
+					var err = data && data.error;
+					if (typeof err === 'string') {
+						if (err === 'AUTH_REQUIRED') {
+							return origAddPopup.call(this, LoginPasswordPopup, { username: data.name });
+						}
+						if (err.indexOf('AUTH_WRONG:') === 0) {
+							return origAddPopup.call(this, LoginPasswordPopup, { username: data.name, error: err.slice(11) });
+						}
+					}
+					return origAddPopup.apply(this, arguments);
+				};
+
+				// Teambuilder: no consultar a Smogon los recursos de cada formato
+				if (window.TeambuilderRoom) {
+					TeambuilderRoom.prototype.tryLoadFormatResource = function (format) {
+						if (!(format in this.formatResources)) this.formatResources[format] = true;
+					};
+				}
+			})();
 		</script>
 
 		<script>
-			// Los recursos ya se han resuelto en local; el login debe ir al servidor oficial
-			Config.routes.client = 'play.pokemonshowdown.com';
+			window.onload = () => {
+				window.app = new App();
+			}
 		</script>
 
 	</body>
