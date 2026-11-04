@@ -482,6 +482,7 @@ export class Pokemon implements PokemonDetails, PokemonHealth {
 			for (const statName of Dex.statNamesExceptHP) {
 				volatilesToRemove.push('protosynthesis' + statName);
 				volatilesToRemove.push('quarkdrive' + statName);
+				volatilesToRemove.push('climadaptacion' + statName);
 			}
 			for (const volatile of volatilesToRemove) {
 				delete this.volatiles[volatile];

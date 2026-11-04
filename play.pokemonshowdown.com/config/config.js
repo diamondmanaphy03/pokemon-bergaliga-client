@@ -34,7 +34,7 @@ Config.customcolors = {
 	'zarel': 'aeo'
 };
 /*** Begin automatically generated configuration ***/
-Config.version = "0.11.2 (32d697fc/c0f6bfc7)";
+Config.version = "0.11.2 (129e9190/02c67685)";
 Config.translationCachebuster = "c911258b";
 
 Config.routes = {

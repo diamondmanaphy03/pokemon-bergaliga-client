@@ -1337,6 +1337,15 @@ export class BattleTooltips {
 					}
 				}
 			}
+			for (const statName of Dex.statNamesExceptHP) {
+				if (clientPokemon.volatiles['climadaptacion' + statName]) {
+					if (statName === 'spe') {
+						speedModifiers.push(1.5);
+					} else {
+						stats[statName] = Math.floor(stats[statName] * 1.5);
+					}
+				}
+			}
 		}
 		if (pokemon.status) {
 			if (ability === 'marvelscale') {
